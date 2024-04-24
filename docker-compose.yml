@@ -1,0 +1,31 @@
+version: '3'
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'    # HTTP
+      - '81:81'    # GUI de Nginx Proxy Manager
+      - '443:443'  # HTTPS
+    environment:
+      DB_MYSQL_HOST: "db"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "npm"
+      DB_MYSQL_PASSWORD: "npm_password"
+      DB_MYSQL_NAME: "nginxproxymanager"
+    depends_on:
+      - db
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+
+  db:
+    image: 'jc21/mariadb-aria:latest'
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root_password'
+      MYSQL_DATABASE: 'nginxproxymanager'
+      MYSQL_USER: 'npm'
+      MYSQL_PASSWORD: 'npm_password'
+    volumes:
+      - ./data/mysql:/var/lib/mysql
